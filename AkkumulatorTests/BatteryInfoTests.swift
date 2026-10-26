@@ -33,6 +33,9 @@ struct BatteryInfoTests {
         #expect(info.chargePercent == 80)
         #expect(info.fullChargeCapacity == 4980)
         #expect(info.designCapacity == 6075)
+        #expect(info.nominalChargeCapacity == 5130)
+        // 5130 / 6075 = 84.4444…%
+        #expect(BatterySample(info).actualHealth! > 0.8444 && BatterySample(info).actualHealth! < 0.8445)
         #expect(info.health! > 0.8197 && info.health! < 0.8198)
         #expect(info.cycleCount == 244)
         #expect(info.designCycleCount == 1000)
@@ -164,6 +167,8 @@ struct CoconutImportTests {
         #expect(info.chargePercent == 80)
         #expect(info.temperature == 29.09)
         #expect(info.batterySerial == "F8Y209XXXXXXXXXXX")
+        #expect(BatterySample(info).nominalChargeCapacity == info.nominalChargeCapacity)
+        #expect(BatterySample(info).actualHealth == nil)
         #expect(throws: CoconutImport.InvalidFile.self) { try CoconutImport.read(Data("nope".utf8), keys: keys) }
 
         let url = FileManager.default.temporaryDirectory.appending(path: "\(UUID()).ccba")

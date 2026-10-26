@@ -84,6 +84,8 @@ struct HistoryView: View {
                     TableColumn("Date", value: \.date) { Text($0.date.formatted(date: .abbreviated, time: .shortened)) }
                         .width(min: 150)
                     TableColumn("Health", value: \.sortHealth) { Text($0.health?.formatted(.percent.precision(.fractionLength(1))) ?? "–") }
+                    TableColumn("Actual Health", value: \.sortActualHealth) { Text($0.actualHealth?.formatted(.percent.precision(.fractionLength(2))) ?? "–") }
+                    TableColumn("Nominal charge capacity", value: \.sortNominal) { Text(format($0.nominalChargeCapacity, "mAh")) }
                     TableColumn("Full Charge", value: \.sortFull) { Text(format($0.fullChargeCapacity, "mAh")) }
                     TableColumn("Design", value: \.sortDesign) { Text(format($0.designCapacity, "mAh")) }
                     TableColumn("Cycles", value: \.sortCycles) { Text(format($0.cycleCount, "")) }
@@ -110,13 +112,14 @@ struct HistoryView: View {
         panel.allowedContentTypes = [.commaSeparatedText]
         panel.nameFieldStringValue = "\(samples.first?.deviceName ?? "Battery") History.csv"
         guard panel.runModal() == .OK, let url = panel.url else { return }
-        let header = "date,device,model,charge_percent,full_charge_capacity_mah,design_capacity_mah,health_percent,cycle_count,temperature_c,voltage_mv"
+        let header = "date,device,model,charge_percent,full_charge_capacity_mah,design_capacity_mah,health_percent,cycle_count,temperature_c,voltage_mv,nominal_charge_capacity_mah"
         let rows = samples.map { s in
             let name = "\"" + s.deviceName.replacingOccurrences(of: "\"", with: "\"\"") + "\""
             let fields: [String?] = [s.date.ISO8601Format(), name, s.model,
              s.chargePercent.map(String.init), s.fullChargeCapacity.map(String.init), s.designCapacity.map(String.init),
              s.health.map { String(format: "%.2f", $0 * 100) }, s.cycleCount.map(String.init),
-             s.temperature.map { String(format: "%.2f", $0) }, s.voltage.map(String.init)]
+             s.temperature.map { String(format: "%.2f", $0) }, s.voltage.map(String.init),
+             s.nominalChargeCapacity.map(String.init)]
             return fields.map { $0 ?? "" }.joined(separator: ",")
         }
         do {
@@ -132,6 +135,8 @@ private extension BatterySample {
     var sortHealth: Double { health ?? -1 }
     var sortFull: Int { fullChargeCapacity ?? -1 }
     var sortDesign: Int { designCapacity ?? -1 }
+    var sortNominal: Int { nominalChargeCapacity ?? -1 }
+    var sortActualHealth: Double { actualHealth ?? -1 }
     var sortCycles: Int { cycleCount ?? -1 }
     var sortCharge: Int { chargePercent ?? -1 }
     var sortTemperature: Double { temperature ?? -999 }

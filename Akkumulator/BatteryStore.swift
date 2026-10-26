@@ -13,6 +13,7 @@ import UserNotifications
     var chargePercent: Int?
     var fullChargeCapacity: Int?
     var designCapacity: Int?
+    var nominalChargeCapacity: Int?
     var cycleCount: Int?
     var temperature: Double?
     var voltage: Int?
@@ -27,6 +28,7 @@ import UserNotifications
         chargePercent = info.chargePercent
         fullChargeCapacity = info.fullChargeCapacity
         designCapacity = info.designCapacity
+        nominalChargeCapacity = info.nominalChargeCapacity
         cycleCount = info.cycleCount
         temperature = info.temperature
         voltage = info.voltage
@@ -36,6 +38,12 @@ import UserNotifications
     var health: Double? {
         guard let full = fullChargeCapacity, let design = designCapacity, design > 0 else { return nil }
         return Double(full) / Double(design)
+    }
+
+    /// Nominal charge capacity relative to design capacity.
+    var actualHealth: Double? {
+        guard let nominal = nominalChargeCapacity, let design = designCapacity, design > 0 else { return nil }
+        return Double(nominal) / Double(design)
     }
 
     var deviceKind: DeviceKind { DeviceKind(rawValue: kind) ?? .other }
